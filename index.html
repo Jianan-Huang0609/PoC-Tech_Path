@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项目记录 · 技术栈矩阵规划器 · v3 (compact)</title>
+  <style>
+    :root{
+      --oat:#EDE3E1; --sage:#C7BEBE; --charcoal:#655C5C; --ink:#2F2A2A; --paper:#FAF8F7;
+      --ok:#2e7d32; --warn:#d97706; --muted:#8b8686;
+      --radius:22px; --gap:14px; --shadow:0 10px 20px rgba(0,0,0,.06);
+
+      /* 固定配色（不再自动切换） */
+      --rowOdd:#FAFAFA;
+      --rowEven:#FFFFFF;
+      --headOdd:#EDE3E1;
+      --headEven:#D6E5E9;
+      --hover:#F0F8FF;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue','Noto Sans SC',Arial}
+    .wrap{max-width:1400px;margin:24px auto;padding:0 16px}
+    .title{font-size:26px;font-weight:800;display:flex;align-items:center;gap:10px}
+    .card{background:white;border:1px solid var(--sage);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap)}
+    .card.pad{padding:16px}
+    .muted{color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:8px;background:var(--oat);border:1px solid var(--sage);padding:6px 10px;border-radius:999px;font-size:12px}
+    input[type=text], select, textarea, input[type=date]{width:100%;padding:10px 12px;border:1px solid var(--sage);border-radius:12px;background:#fff}
+    textarea{min-height:88px;resize:vertical}
+
+    /* 矩阵表格 */
+    .matrix-wrap{margin-top:16px;overflow:auto}
+    table.matrix{border-collapse:separate;border-spacing:0;min-width:1600px} /* 更宽 */
+    .matrix th,.matrix td{border:1px solid var(--sage);padding:10px;vertical-align:top;background:#fff}
+    .matrix thead th{position:sticky;top:0;background:var(--oat);z-index:2}
+    .matrix tbody th{position:sticky;left:0;background:var(--oat);z-index:1;min-width:180px} /* 第一列更窄 */
+    .matrix td{min-width:240px} /* 数据列更宽 */
+    .matrix td.disabled{background:#f5f5f5;color:#aaa;text-align:center}
+    .cell-box{display:flex;flex-direction:column;gap:8px}
+    .options{display:flex;flex-direction:column;gap:6px}
+    .opt{display:flex;align-items:center;gap:8px}
+    .opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--charcoal)}
+    .note-toggle{cursor:pointer;border:none;background:transparent;color:var(--charcoal);font-size:12px;text-decoration:underline;align-self:flex-start}
+    .cell-note{display:none}
+    .cell-note.show{display:block}
+
+    /* 行条纹固定 + 悬停 */
+    .matrix tbody tr:nth-child(odd) td{background:var(--rowOdd)}
+    .matrix tbody tr:nth-child(even) td{background:var(--rowEven)}
+    .matrix tbody tr:hover td{background:var(--hover)}
+    /* 表头交替色块 */
+    .matrix thead th:nth-child(odd){background:var(--headOdd)}
+    .matrix thead th:nth-child(even){background:var(--headEven)}
+
+    /* 备注与日历：高度对齐 */
+    .row-notes{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);align-items:stretch}
+    .h-260{min-height:260px}
+
+    /* ToDo 样式 + 紧凑工具栏 */
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .btn{border:1px solid var(--charcoal);background:var(--charcoal);color:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-size:13px}
+    .btn.ghost{background:#fff;color:var(--charcoal)}
+    .btn.warn{background:var(--warn);border-color:var(--warn)}
+    .btn.ok{background:var(--ok);border-color:var(--ok)}
+    .small{font-size:12px}
+    .todo-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--sage);border-radius:12px}
+    .todo-item.done{opacity:.6;text-decoration:line-through}
+
+    /* 概览条（单行横向滚动的小卡片） */
+    .summary-strip{display:flex;gap:10px;overflow:auto;padding:8px}
+    .summary-card{min-width:230px;max-width:230px}
+    .footer{margin:18px 0 40px;text-align:center;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">📒 项目记录 · 技术栈矩阵规划器 <span class="pill muted">纵轴：技术选择｜横轴：阶段</span></div>
+
+    <!-- 顶部信息栏 -->
+    <div class="card pad" style="margin-top:14px">
+      <div class="row">
+        <div>
+          <label class="small muted">开发阶段（V1–V5）</label>
+          <select id="phaseStage">
+            <option value="V1">V1</option>
+            <option value="V2">V2</option>
+            <option value="V3">V3</option>
+            <option value="V4">V4</option>
+            <option value="V5">V5</option>
+          </select>
+        </div>
+        <div>
+          <label class="small muted">子版本号</label>
+          <input type="text" id="subVersion" placeholder="例如：2025.08.21-a" />
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px">
+          <button class="btn ok" id="confirmMeta">确认</button>
+          <button class="btn ghost" id="editMeta" style="display:none">修改</button>
+          <span class="small muted" id="metaStatus"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 矩阵（纵轴×横轴） -->
+    <div class="card pad" style="margin-top:14px">
+      <div class="toolbar" style="margin-bottom:10px">
+        <button class="btn ok" id="saveBtn">保存（本地）</button>
+        <button class="btn ghost" id="exportBtn">导出 JSON</button>
+        <label class="btn ghost" for="importFile">导入 JSON</label>
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+        <button class="btn warn" id="resetBtn">重置</button>
+      </div>
+      <div class="matrix-wrap">
+        <table class="matrix" id="matrix"></table>
+      </div>
+    </div>
+
+    <!-- 备注 + Calendar ToDo 对齐区块 -->
+    <div class="row-notes" style="margin-top:14px">
+      <div class="card pad h-260" style="display:flex;flex-direction:column">
+        <div class="small muted">备注栏（总体想法、测试结果、改进方向）</div>
+        <textarea id="globalNotes" style="flex:1" placeholder="示例：ES（BM25）+ FAISS 的混合检索优于单向量；下一步按 RGB/RAGTruth 评测集做回归……"></textarea>
+      </div>
+      <div class="card pad h-260" style="display:flex;flex-direction:column">
+        <div class="small muted">Calendar ToDo</div>
+        <div class="row" style="grid-template-columns:1fr 2fr auto;gap:10px">
+          <div><input type="date" id="todoDate" /></div>
+          <div><input type="text" id="todoText" placeholder="待办事项，如：抽样复核召回 Top-K 质量" /></div>
+          <div><button class="btn" id="addTodo">添加</button></div>
+        </div>
+        <div id="todoList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;overflow:auto"></div>
+      </div>
+    </div>
+
+    <!-- 紧凑概览（单行横向滚动） -->
+    <div class="card pad" style="margin-top:14px">
+      <div class="small muted">概览</div>
+      <div id="summaryStrip" class="summary-strip"></div>
+    </div>
+
+    <div class="footer">@ Jianan · 医械 RA 圈 · 最懂AI · 爱游泳的辩论选手</div>
+  </div>
+
+  <script>
+    // —— 阶段（横轴） ——
+    const PHASES = [
+      '文档采集/解析',
+      '清洗/归一化',
+      '切块',
+      '向量化/索引',
+      '检索（混合召回）',
+      '重排',
+      '生成（Reasoning）',
+      '审核/后处理',
+      '评测/监控',
+      '部署/安全'
+    ];
+
+    // —— 技术栏目（纵轴） ——
+    const CATEGORIES = [
+      {
+        id:'dp',
+        name:'数据处理 (Data Processing)',
+        options:[],
+        options_by_phase:{
+          '文档采集/解析':[
+            '>>简单文档加载 (Word-txt)',
+            '>>多格式解析 (Word, PDF, 图表)',
+            '>>多源数据接入 (注册包 + 项目包)'
+          ],
+          '清洗/归一化':[
+            '>>复杂跨域数据清洗',
+            '>>高质量 Instruction–Answer 数据增强',
+            '>>高质量数据对 (RA+R&D)'
+          ],
+          '切块':[
+            '>>章节/语义切块 + 元数据抽取'
+          ]
+        }
+      },
+      {
+        id:'kb',
+        name:'知识库搭建 (Knowledge Base Setup)',
+        options:[
+          '>>单一来源：Input 示例 + 官方文档',
+          '>>Embedding API',
+          '>>本地向量库- (FAISS/Chroma)/托管向量库？',
+          '>>多源索引 + 路径化 RAG 构建 支持跨包/跨域数据流',
+          '>>多源 RAG 知识库',
+          '>>RGB / RAGTruth 测试集（验证基准）',
+          '>>长期记忆型向量库',
+          '>>动态更新基准测试集（RGB/RAGTruth迭代）'
+        ],
+        phases:['向量化/索引']
+      },
+      {
+        id:'retr',
+        name:'检索 (Retrieval)',
+        options:[
+          '">>基于 Prompt 的关键词检索\\n简单多轮检索"',
+          '">>BM25（关键词）：Elasticsearch/Lucene 内置。\\n\\n>>向量检索（语义）：FAISS/Pinecone。 \\n\\n >>混合检索：把两类分数加权，取综合 Top-K。"',
+          '">>动态 RAG 检索链\\n\\n>>数据对驱动召回"',
+          '">>结构化检索链 (Multi-Hop)\\n+ Hybrid RAG"',
+          '">>长上下文检索\\n\\n>>动态路由选择"'
+        ],
+        phases:['检索（混合召回）']
+      },
+      {
+        id:'re_rank',
+        name:'重排 (Re-ranking)',
+        options:[
+          '规则匹配',
+          'Bi-Encoder / Cross-Encoder / ReRank 模型',
+          'ReRank 优化；可观测性日志',
+          '可插拔 ReRank',
+          '自适应重排'
+        ],
+        phases:['重排']
+      },
+      {
+        id:'gen2',
+        name:'生成 (Generation)（脚本/小模型/智能体-LangGraph）',
+        options:[
+          'API 调用；分模块 Prompt',
+          '精细化 Prompt 链；对话历史管理',
+          '分链路脚本 + 小模型；人工评判标准；模拟评估 API',
+          '小模型微调；分链路脚本协作',
+          '多智能体协作；LangGraph/TaskGraph'
+        ],
+        phases:['生成（Reasoning）']
+      },
+      { id:'post', name:'后处理/引用', options:['逐条引用（文档/章节/页码）','python-docx 套版','Guardrails（空答/低置信提示）','证据高亮与跳转'], phases:['审核/后处理'] },
+      { id:'eval', name:'评测指标', options:['Recall@k','MRR/nDCG','首屏可用率','引用完整率','人工抽检面板'], phases:['评测/监控'] },
+      { id:'obs', name:'监控与日志', options:['Prometheus/Grafana','OpenTelemetry 链路','失败重试/幂等哈希','周报自动化'], phases:['评测/监控'] },
+      { id:'deploy', name:'部署方式', options:['FastAPI 服务化','Celery/RQ 异步索引','HPA/读写分离','访问控制与脱敏日志','私有化/内网化'], phases:['部署/安全'] },
+    ];
+
+    // —— 状态 ——
+    const defaultState = {
+      meta:{stage:'V1', subVersion:'', confirmed:false},
+      selections:{},
+      notes:{},
+      globalNotes:'',
+      todos:[]
+    };
+    let state = loadState();
+
+    // —— 渲染 ——
+    function matrixHeadRow(){
+      const badge = `<div class="small muted" id="stageBadge">阶段：${state.meta.stage||''}  子版本：${state.meta.subVersion||''}</div>`;
+      return `<thead><tr><th style="min-width:180px">技术选择\\进程${badge}</th>${PHASES.map(p=>`<th>${p}</th>`).join('')}</tr></thead>`;
+    }
+
+    function renderMatrix(){
+      const table = document.getElementById('matrix');
+      const thead = matrixHeadRow();
+
+      const tbodyRows = CATEGORIES.map(cat=>{
+        const cells = PHASES.map(phase=>{
+          const explicitlyLimited = Array.isArray(cat.phases);
+          let allowed = true;
+          if(explicitlyLimited){
+            allowed = cat.phases.includes(phase);
+          }else if(cat.options_by_phase){
+            allowed = Array.isArray(cat.options_by_phase[phase]);
+          }else{
+            allowed = false;
+          }
+          if(!allowed){ return `<td class="disabled">—</td>`; }
+
+          const optionList = (cat.options_by_phase && cat.options_by_phase[phase]) ? cat.options_by_phase[phase] : (cat.options || []);
+          const key = keyOf(cat.id, phase);
+          const chosen = state.selections[key] || [];
+          const note = state.notes[key] || '';
+          const options = optionList.map(o=>{
+            const checked = chosen.includes(o) ? 'checked' : '';
+            return `<label class="opt"><input type="checkbox" data-key="${key}" data-val="${escapeHtml(o)}" ${checked}/> ${escapeHtml(o).replace(/\\n/g,'<br/>')}</label>`
+          }).join('');
+          return `<td>
+            <div class="cell-box">
+              <div class="options">${options || '<div class="muted small">（此列暂无可选项）</div>'}</div>
+              <button class="note-toggle" data-key="${key}">📝 备注</button>
+              <textarea class="cell-note ${note? 'show':''}" data-key="${key}" placeholder="记录该环节的测试结果或改进方向……">${escapeHtml(note)}</textarea>
+            </div>
+          </td>`;
+        }).join('');
+        return `<tr><th>${cat.name}</th>${cells}</tr>`;
+      }).join('');
+
+      table.innerHTML = thead + `<tbody>${tbodyRows}</tbody>`;
+
+      // 事件绑定
+      table.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+        cb.addEventListener('change', (e)=>{
+          const key = e.target.dataset.key;
+          const val = e.target.dataset.val;
+          if(!state.selections[key]) state.selections[key]=[];
+          const arr = state.selections[key];
+          const idx = arr.indexOf(val);
+          if(e.target.checked){ if(idx<0) arr.push(val); }
+          else{ if(idx>=0) arr.splice(idx,1); }
+          saveState(); renderSummaryStrip();
+        })
+      });
+      table.querySelectorAll('.note-toggle').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const key = e.target.dataset.key;
+          const ta = table.querySelector(`textarea[data-key="${cssEscape(key)}"]`);
+          ta.classList.toggle('show');
+        })
+      });
+      table.querySelectorAll('textarea.cell-note').forEach(ta=>{
+        ta.addEventListener('input', (e)=>{
+          const key = e.target.dataset.key;
+          state.notes[key] = e.target.value; saveState();
+        })
+      });
+
+      updateStageBadge();
+    }
+
+    function updateStageBadge(){
+      const el = document.getElementById('stageBadge');
+      if(!el) return;
+      el.textContent = `阶段：${state.meta.stage||''}  子版本：${state.meta.subVersion||''}`;
+    }
+
+    function renderMeta(){
+      const stageSel = document.getElementById('phaseStage');
+      stageSel.value = state.meta.stage || 'V1';
+      const sv = document.getElementById('subVersion');
+      sv.value = state.meta.subVersion || '';
+      const status = document.getElementById('metaStatus');
+      const confirmBtn = document.getElementById('confirmMeta');
+      const editBtn = document.getElementById('editMeta');
+
+      stageSel.disabled = sv.disabled = !!state.meta.confirmed;
+      confirmBtn.style.display = state.meta.confirmed ? 'none' : '';
+      editBtn.style.display = state.meta.confirmed ? '' : 'none';
+      status.textContent = state.meta.confirmed? '已确认并标注在表格左上角' : '未确认';
+    }
+
+    function renderSummaryStrip(){
+      const box = document.getElementById('summaryStrip');
+      const items = PHASES.map((phase, idx)=>{
+        const lines = CATEGORIES.filter(c=>{
+          if(Array.isArray(c.phases)) return c.phases.includes(phase);
+          if(c.options_by_phase) return Array.isArray(c.options_by_phase[phase]);
+          return false;
+        }).map(cat=>{
+          const key = keyOf(cat.id, phase);
+          const chosen = state.selections[key]||[];
+          const short = chosen.slice(0,3).join('，') + (chosen.length>3? ' 等…':'' );
+          return chosen.length? `<div class="small"><b>${cat.name}：</b>${short}</div>`: '';
+        }).filter(Boolean).join('');
+        return `<div class="card pad summary-card"><div class="small muted">${idx+1}. ${phase}</div>${lines || '<div class="small muted">尚未选择</div>'}</div>`;
+      }).join('');
+      box.innerHTML = items;
+    }
+
+    function renderTodos(){
+      const list = document.getElementById('todoList');
+      if(!state.todos) state.todos = [];
+      list.innerHTML = '';
+      state.todos
+        .slice().sort((a,b)=> (a.date||'').localeCompare(b.date||''))
+        .forEach((t,idx)=>{
+          const div = document.createElement('div');
+          div.className = 'todo-item' + (t.done? ' done':'' );
+          div.innerHTML = `
+            <div>
+              <div><b>${escapeHtml(t.text||'')}</b></div>
+              <div class="small muted">${t.date || '无日期'}</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn ghost small" data-act="toggle" data-idx="${idx}">${t.done? '恢复':'完成'}</button>
+              <button class="btn warn small" data-act="del" data-idx="${idx}">删除</button>
+            </div>`;
+          list.appendChild(div);
+        });
+
+      list.querySelectorAll('button').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const act = e.target.dataset.act;
+          const i = +e.target.dataset.idx;
+          if(act==='del'){ state.todos.splice(i,1); }
+          if(act==='toggle'){ state.todos[i].done = !state.todos[i].done; }
+          saveState(); renderTodos();
+        })
+      })
+    }
+
+    // —— 事件 ——
+    document.getElementById('confirmMeta').addEventListener('click', ()=>{
+      state.meta.stage = document.getElementById('phaseStage').value;
+      state.meta.subVersion = document.getElementById('subVersion').value.trim();
+      state.meta.confirmed = true; saveState(); renderMeta(); updateStageBadge();
+    });
+    document.getElementById('editMeta').addEventListener('click', ()=>{
+      state.meta.confirmed = false; saveState(); renderMeta();
+    });
+    document.getElementById('saveBtn').addEventListener('click', ()=>{
+      saveState(); alert('已保存到本地（localStorage）。');
+    });
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `tech-matrix-${(state.meta.stage||'V')}-${(state.meta.subVersion||'').replace(/\\s+/g,'')}.json`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('importFile').addEventListener('change', (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          const obj = JSON.parse(reader.result);
+          state = Object.assign({}, defaultState, obj);
+          saveState(); renderAll();
+        }catch(err){ alert('导入失败：JSON 无法解析'); }
+      };
+      reader.readAsText(file);
+    });
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      if(confirm('确定要重置吗？这会清空当前页面的选择与记录。')){
+        state = JSON.parse(JSON.stringify(defaultState));
+        saveState(); renderAll();
+      }
+    });
+    document.getElementById('globalNotes').addEventListener('input', (e)=>{
+      state.globalNotes = e.target.value; saveState();
+    });
+    document.getElementById('addTodo').addEventListener('click', ()=>{
+      const text = document.getElementById('todoText').value.trim();
+      const date = document.getElementById('todoDate').value;
+      if(!text) return alert('请输入待办内容');
+      state.todos.push({text,date,done:false});
+      document.getElementById('todoText').value='';
+      saveState(); renderTodos();
+    });
+
+    // —— 存取 ——
+    const KEY = 'ra-tech-matrix-v3-compact';
+    function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+    function loadState(){
+      try{ const raw = localStorage.getItem(KEY); return raw? JSON.parse(raw): JSON.parse(JSON.stringify(defaultState)); }
+      catch(e){ return JSON.parse(JSON.stringify(defaultState)); }
+    }
+
+    // —— utils ——
+    function keyOf(catId, phase){ return `${catId}|${phase}`; }
+    function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;' }[m])); }
+    function cssEscape(s){ return (s||'').replace(/[^a-zA-Z0-9_-]/g, m=>`\\${m}`); }
+
+    function renderAll(){
+      renderMatrix();
+      renderMeta();
+      renderSummaryStrip();
+      renderTodos();
+      document.getElementById('globalNotes').value = state.globalNotes || '';
+    }
+
+    // 初始渲染
+    renderAll();
+  </script>
+</body>
+</html>
