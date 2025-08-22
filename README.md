@@ -1,5 +1,7 @@
 # PoC‑Tech_Path — 项目PoC技术路径网站
 
+## 链接🔗：https://jianan-huang0609.github.io/PoC-Tech_Path/
+
 > 一页式展示 **注册项目全周期 × 技术路径（V1–V5）** 的可视化网站。用于快速对齐 PoC 目标、技术路线、ROI 与成本，并支持后续按模块逐步落地。
 
 ## 🎯 这个网站解决什么问题？
