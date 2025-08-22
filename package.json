@@ -1,6 +1,6 @@
 {
   "name": "poc-tech-path",
-  "version": "3.0.0",
+  "version": "1.2.0",
   "description": "技术栈矩阵规划器 - 项目记录与技术选择管理工具",
   "main": "index.html",
   "type": "module",
