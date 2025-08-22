@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 自动更新日志脚本
+echo "🔄 正在更新项目日志..."
+
+# 获取最新的提交信息
+COMMIT_HASH=$(git rev-parse --short HEAD)
+COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+BRANCH=$(git branch --show-current)
+DATE=$(date +"%Y-%m-%d")
+AUTHOR=$(git log -1 --pretty=format:"%an")
+
+# 运行更新日志脚本
+node scripts/update-log.mjs "$DATE" "$COMMIT_HASH" "$BRANCH" "$COMMIT_MSG" "$AUTHOR"
+
+echo "✅ 日志更新完成！"

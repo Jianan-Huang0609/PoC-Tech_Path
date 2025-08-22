@@ -1,0 +1,35 @@
+{
+  "name": "poc-tech-path",
+  "version": "3.0.0",
+  "description": "技术栈矩阵规划器 - 项目记录与技术选择管理工具",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "start": "python -m http.server 8000",
+    "update-log": "node scripts/update-log.mjs",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "技术栈",
+    "项目规划",
+    "矩阵管理",
+    "进度跟踪"
+  ],
+  "author": "Jianan-Huang0609",
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "^8.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jianan-Huang0609/PoC-Tech_Path.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jianan-Huang0609/PoC-Tech_Path/issues"
+  },
+  "homepage": "https://github.com/Jianan-Huang0609/PoC-Tech_Path#readme"
+}
