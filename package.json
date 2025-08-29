@@ -1,35 +1,65 @@
 {
-  "name": "poc-tech-path",
-  "version": "1.2.0",
-  "description": "技术栈矩阵规划器 - 项目记录与技术选择管理工具",
+  "name": "vb-helps-vber-poc-tech-path",
+  "version": "1.2.1",
+  "description": "VB小助手融合项目 - 技术栈矩阵规划器与多人协作平台",
   "main": "index.html",
   "type": "module",
   "scripts": {
     "dev": "python -m http.server 8000",
     "start": "python -m http.server 8000",
+    "build": "echo 'Building static site...' && cp -r . dist/",
     "update-log": "node scripts/update-log.mjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "platform:dev": "cd poc-tech-platform && npm run dev",
+    "platform:build": "cd poc-tech-platform && npm run build",
+    "platform:start": "cd poc-tech-platform && npm run start"
   },
   "keywords": [
-    "技术栈",
+    "vb-helper",
+    "技术栈矩阵",
+    "协作平台",
     "项目规划",
     "矩阵管理",
-    "进度跟踪"
+    "进度跟踪",
+    "医疗器械",
+    "监管事务",
+    "next.js",
+    "react",
+    "typescript"
   ],
-  "author": "Jianan-Huang0609",
+  "author": {
+    "name": "Jianan Huang",
+    "email": "z004wtps@siemens-healthineers.com",
+    "organization": "Siemens Healthineers"
+  },
   "license": "MIT",
   "devDependencies": {
     "husky": "^8.0.3"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jianan-Huang0609/PoC-Tech_Path.git"
+    "url": "https://github.com/z004wtps/VB-Helps-VBer.git"
   },
   "bugs": {
-    "url": "https://github.com/Jianan-Huang0609/PoC-Tech_Path/issues"
+    "url": "https://github.com/z004wtps/VB-Helps-VBer/issues"
   },
-  "homepage": "https://github.com/Jianan-Huang0609/PoC-Tech_Path#readme"
+  "homepage": "https://github.com/z004wtps/VB-Helps-VBer#readme",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/z004wtps"
+  },
+  "contributors": [
+    {
+      "name": "Jianan Huang",
+      "email": "z004wtps@siemens-healthineers.com",
+      "role": "Lead Developer"
+    }
+  ],
+  "workspaces": [
+    "poc-tech-platform"
+  ]
 }

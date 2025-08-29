@@ -2,6 +2,13 @@
 
 ## 版本历史
 
+### v1.2.1 - 2025-08-25
+- 📚 **项目文档规范化**：创建完整的README.md、CONTRIBUTING.md、LICENSE
+- 🏗️ **项目架构优化**：更新package.json配置，添加workspaces支持
+- 🔧 **版本控制规范**：创建.gitignore文件，规范化项目结构
+- 📊 **项目可视化**：添加项目架构图表和开发路线图
+- 🎯 **GitHub集成准备**：完善项目信息，准备推送到GitHub仓库
+
 ### v1.2.0 - 2024-12-19
 - 📚 **完整开发文档**：创建产品需求文档(PRD)、技术实施指南、开发清单
 - 🏗️ **项目架构设计**：Next.js + TypeScript + Prisma + Supabase技术栈
