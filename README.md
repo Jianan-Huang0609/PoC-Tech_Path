@@ -1,8 +1,9 @@
 # VB小助手融合项目 (VB-Helps-VBer × PoC-Tech_Path)
 
-<div align="center">
+## 🌐 在线演示
+**链接🔗**: [https://vb-helps-vber.github.io/PoC-Tech_Path/](https://vb-helps-vber.github.io/PoC-Tech_Path/)
 
-![Version](https://img.shields.io/badge/version-v1.2.1-blue.svg)
+<div align="center">
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.0-black.svg)
@@ -99,7 +100,7 @@ poc-tech-platform/         # Next.js 应用
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/z004wtps/PoC-Tech_Path.git
+   git clone https://github.com/VB-Helps-VBer/PoC-Tech_Path.git
    cd PoC-Tech_Path
    ```
 
@@ -271,8 +272,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 **标语**: *最懂AI · 爱游泳的辩论选手*
 
 - 📧 Email: [项目邮箱]
-- 🐛 Issues: [GitHub Issues](https://github.com/z004wtps/PoC-Tech_Path/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/z004wtps/PoC-Tech_Path/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/VB-Helps-VBer/PoC-Tech_Path/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/VB-Helps-VBer/PoC-Tech_Path/discussions)
 
 ---
 
@@ -288,7 +289,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 **⭐ 如果这个项目对您有帮助，请给我们一个星星！**
 
-[![Stars](https://img.shields.io/github/stars/z004wtps/PoC-Tech_Path?style=social)](https://github.com/z004wtps/PoC-Tech_Path/stargazers)
-[![Forks](https://img.shields.io/github/forks/z004wtps/PoC-Tech_Path?style=social)](https://github.com/z004wtps/PoC-Tech_Path/network/members)
+[![Stars](https://img.shields.io/github/stars/VB-Helps-VBer/PoC-Tech_Path?style=social)](https://github.com/VB-Helps-VBer/PoC-Tech_Path/stargazers)
+[![Forks](https://img.shields.io/github/forks/VB-Helps-VBer/PoC-Tech_Path?style=social)](https://github.com/VB-Helps-VBer/PoC-Tech_Path/network/members)
 
 </div>
